@@ -85,7 +85,7 @@ with user_upload[1]:
        st.markdown(language_index['grade_upload'][english_mode])
        grade_upload = st.file_uploader(language_index['grade_upload_des'][english_mode])
        if grade_upload:
-              try:
+              # try:
                      grade_upload = pd.read_excel(grade_upload)
                      # check unordered list of grade template columns in unordered list of grade upload columns
                      check = []
