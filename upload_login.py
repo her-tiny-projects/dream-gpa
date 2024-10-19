@@ -99,8 +99,8 @@ with user_upload[1]:
                      if False not in check:
                             st.session_state.grade_upload = grade_upload
                             upload1 = True
-              except:
-                     st.error(language_index['format_error'][english_mode])
+              # except:
+              #        st.error(language_index['format_error'][english_mode])
 
 # huhu xem lại phần tracking --> done
 # layout
