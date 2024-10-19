@@ -11,10 +11,17 @@ from google.cloud import firestore
 import json, toml
 import time
 from datetime import datetime
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
 
 # CONNECT WITH FIREBASE DB
-key_dict = json.loads(st.secrets['credentials']) # streamlit load key.toml --> toml strings = json strings --> json.loads (to load json strings)
+# key_dict = json.loads(st.secrets['credentials']) # streamlit load key.toml --> toml strings = json strings --> json.loads (to load json strings)
+# creds = service_account.Credentials.from_service_account_info(key_dict)
+# db = firestore.Client(credentials=creds)
+
+key_dict = json.loads(os.getenv('credentials')) 
 creds = service_account.Credentials.from_service_account_info(key_dict)
 db = firestore.Client(credentials=creds)
 

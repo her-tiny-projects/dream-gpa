@@ -8,16 +8,8 @@ from math import ceil
 from plotly import graph_objects as go
 from google.oauth2 import service_account
 from google.cloud import firestore
-import json, toml
 import time
-from datetime import datetime
 
-
-
-# CONNECT WITH FIREBASE DB
-key_dict = json.loads(st.secrets['credentials']) # streamlit load key.toml --> toml strings = json strings --> json.loads (to load json strings)
-creds = service_account.Credentials.from_service_account_info(key_dict)
-db = firestore.Client(credentials=creds)
 
 
 empty_table = pd.DataFrame(columns=['temp'], index=[''])
@@ -48,7 +40,7 @@ language_index = {'grade_upload': ['UPLOAD BẢNG ĐIỂM', 'UPLOAD YOUR TRANSCR
                   'start_button': ['BẮT ĐẦU', 'START']}
 
 # 2. LOGIN --> check
-streamlit_analytics.start_tracking(firestore_key_file='.streamlit/db_key.json', firestore_collection_name='app_analytics')
+streamlit_analytics.start_tracking(firestore_key_file='db_key.json', firestore_collection_name='app_analytics')
 grade_template = pd.DataFrame({
                             'Stt': '',
                             'Mã MH': '',
@@ -149,4 +141,4 @@ if upload1==True and upload2==True:
 
 
 
-streamlit_analytics.stop_tracking(firestore_key_file='.streamlit/db_key.json', firestore_collection_name='app_analytics')
+streamlit_analytics.stop_tracking(firestore_key_file='db_key.json', firestore_collection_name='app_analytics')
