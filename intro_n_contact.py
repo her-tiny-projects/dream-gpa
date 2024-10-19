@@ -29,8 +29,8 @@ intro_en = """
        Tutorial video :arrow_down::
        """
 
-connect_vn = 'KẾT NỐI VỚI MÌNH'
-connect_en = 'CONNECT WITH ME'
+connect_vn = '### KẾT NỐI VỚI MÌNH:'
+connect_en = '### CONNECT WITH ME:'
 
 skype_link = 'https://join.skype.com/invite/x7OxEPJyQ4tb'
 github_link = 'https://github.com/her-tiny-projects'
@@ -49,8 +49,8 @@ contact_en = f"""
        ---
        """
 
-notice_vn = 'NHẮN NHỦ'
-notice_en = 'NOTICE'
+notice_vn = '### NHẮN NHỦ:'
+notice_en = '### NOTICE:'
 
 notice_content_vn = """
        - Dự án chỉ phục vụ mục đích học tập, không thu phí và không thu thập bất cứ dữ liệu điểm, chương trình đào tạo của người dùng
@@ -80,10 +80,10 @@ video = st.columns((1,2,1))
 # video[1].video(link_youtube)
 
 
-st.markdown(f'### {language_index['connect'][english_mode]}:')
+st.markdown(language_index['connect'][english_mode])
 st.markdown(language_index['contact'][english_mode])
 
-st.markdown(f'### {language_index['notice'][english_mode]}:')
+st.markdown(language_index['notice'][english_mode])
 st.warning(language_index['notice_content'][english_mode])
 # st.logo
 # ----------------------------------------------------------------------

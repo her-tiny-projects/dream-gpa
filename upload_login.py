@@ -31,12 +31,12 @@ if 'english_mode' not in st.session_state:
 english_mode = st.session_state.english_mode
 
 
-language_index = {'grade_upload': ['UPLOAD BẢNG ĐIỂM', 'UPLOAD YOUR TRANSCRIPT'],
-                  'grade_upload_des': ['Download bảng điểm ở ftugate và upload vào ô dưới', 'Please attach your transcript from ftugate to the box below'],
-                  'syllabus_upload': ['UPLOAD CHƯƠNG TRÌNH ĐÀO TẠO', 'UPLOAD YOUR CURRICULUM'],
-                  'syllabus_upload_des': ['Download chương trình đào tạo ở ftugate và upload vào ô dưới', 'Please attach your curriculum from ftugate to the box below'],
+language_index = {'grade_upload': ['### UPLOAD BẢNG ĐIỂM', '### UPLOAD YOUR TRANSCRIPT'],
+                  'grade_upload_des': ['Download bảng điểm ở ftugate và upload vào ô dưới:', 'Please attach your transcript from ftugate to the box below:'],
+                  'syllabus_upload': ['### UPLOAD CHƯƠNG TRÌNH ĐÀO TẠO', '### UPLOAD YOUR CURRICULUM'],
+                  'syllabus_upload_des': ['Download chương trình đào tạo ở ftugate và upload vào ô dưới:', 'Please attach your curriculum from ftugate to the box below:'],
                   'template_error': ['File không đúng mẫu! Bạn kiểm tra xem file của mình có chưa các cột như mẫu dưới đây không nhé', "Incorrect file format! Please make sure your file contains columns as the template below"],
-                  'format_error': ['File không đúng định dạng Excel', 'Incorrect file format! Only Excel is accepted'],
+                  'format_error': ['File không đúng định dạng Excel!', 'Incorrect file format! Only Excel is accepted!'],
                   'start_button': ['BẮT ĐẦU', 'START']}
 
 # 2. LOGIN --> check
@@ -82,8 +82,8 @@ upload1 = False
 upload2 = False
 user_upload = st.columns((1,4,1))
 with user_upload[1]:
-       st.markdown(f'### {language_index['grade_upload'][english_mode]}')
-       grade_upload = st.file_uploader(f'{language_index['grade_upload_des'][english_mode]}:')
+       st.markdown(language_index['grade_upload'][english_mode])
+       grade_upload = st.file_uploader(language_index['grade_upload_des'][english_mode])
        if grade_upload:
               try:
                      grade_upload = pd.read_excel(grade_upload)
@@ -92,7 +92,7 @@ with user_upload[1]:
                      for item in grade_template.columns:
                             if item not in grade_upload.columns:
                                    st.session_state.grade_upload_fail = st.session_state.grade_upload_fail+1
-                                   st.error(f'{language_index['template_error'][english_mode]}!')
+                                   st.error(language_index['template_error'][english_mode])
                                    st.dataframe(grade_template, hide_index=True, use_container_width=True)
                                    check.append(False)
                                    break
@@ -100,15 +100,15 @@ with user_upload[1]:
                             st.session_state.grade_upload = grade_upload
                             upload1 = True
               except:
-                     st.error(f'{language_index['format_error'][english_mode]}!')
+                     st.error(language_index['format_error'][english_mode])
 
 # huhu xem lại phần tracking --> done
 # layout
 
 user_upload2 = st.columns((1,4,1))
 with user_upload2[1]:
-       st.markdown(f'### {language_index['syllabus_upload'][english_mode]}')
-       syllabus_upload = st.file_uploader(f'{language_index['syllabus_upload_des'][english_mode]}:')
+       st.markdown(language_index['syllabus_upload'][english_mode])
+       syllabus_upload = st.file_uploader(language_index['syllabus_upload_des'][english_mode])
        if syllabus_upload:
               try:
                      syllabus_upload = pd.read_excel(syllabus_upload)
@@ -117,7 +117,7 @@ with user_upload2[1]:
                      for item in syllabus_template.columns:
                             if item not in syllabus_upload.columns:
                                    st.session_state.syllabus_upload_fail = st.session_state.syllabus_upload_fail + 1
-                                   st.error(f'{language_index['template_error'][english_mode]}!')
+                                   st.error(language_index['template_error'][english_mode])
                                    st.dataframe(syllabus_template, hide_index=True, use_container_width=True)
                                    check.append(False)
                                    break
@@ -125,7 +125,7 @@ with user_upload2[1]:
                             st.session_state.syllabus_upload = syllabus_upload
                             upload2 = True
               except:
-                     st.error(f'{language_index['format_error'][english_mode]}!')
+                     st.error(language_index['format_error'][english_mode])
 
 if upload1==True and upload2==True:
        progress_bar = st.columns(3)

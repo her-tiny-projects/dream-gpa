@@ -27,7 +27,7 @@ if 'english_mode' not in st.session_state:
 english_mode = st.session_state.english_mode
 
 # 1. language mode
-language_index = {'form_name': ['BÁO LỖI', 'BUG REPORT'],
+language_index = {'form_name': ['## :envelope: BÁO LỖI', '## :envelope: BUG REPORT'],
                    'notification': ['Có gì đó không ổn khi upload dữ liệu, bạn điền vào mẫu Báo lỗi dưới đây để mình biết nhé. Cảm ơn bạn!', 'You seem encounter an issue. Please provide details in the form below.'],
                    'email': ['Email của bạn:', 'Your email:'],
                    'description': ['Mô tả vấn đề bạn gặp phải:(*)', 'Describe your issue(s):(*)'],
@@ -40,7 +40,7 @@ cols = st.columns((1,3,1))
 with cols[1]:
     with st.form('bug_report_form', clear_on_submit=True):
             st.info(language_index['notification'][english_mode])
-            st.markdown(f'## :envelope: {language_index['form_name'][english_mode]}')
+            st.markdown(language_index['form_name'][english_mode])
             form_id = str(round(time.time()))
             form_date = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
             report_email = st.text_input(language_index['email'][english_mode])
