@@ -45,7 +45,7 @@ language_index = {'grade_upload': ['### UPLOAD BẢNG ĐIỂM', '### UPLOAD YOUR
                   'start_button': ['BẮT ĐẦU', 'START']}
 
 # 2. LOGIN --> check
-streamlit_analytics.start_tracking(firestore_key_file='db_key.json', firestore_collection_name='app_analytics')
+streamlit_analytics.start_tracking(firestore_key_file='db_key.json', firestore_collection_name='app_metrics')
 grade_template = pd.DataFrame({
                             'Stt': '',
                             'Mã MH': '',
@@ -145,4 +145,4 @@ if upload1==True and upload2==True:
               start_button = st.button(language_index['start_button'][english_mode], use_container_width=True, key='start_button')
 
 
-streamlit_analytics.stop_tracking(firestore_key_file='db_key.json', firestore_collection_name='app_analytics')
+streamlit_analytics.stop_tracking(firestore_key_file='db_key.json', firestore_collection_name='app_metrics')

@@ -99,6 +99,3 @@ else:
               page = st.navigation([intro_n_contact, upload_login])
 
 page.run()
-
-
-
