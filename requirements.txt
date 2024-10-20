@@ -1,9 +1,8 @@
-duckdb==1.0.0
-numpy==2.1.2
-pandas==2.2.3
-plotly==5.22.0
+duckdb==1.1.2
+numpy==1.26.4
+pandas==2.1.4
+plotly==5.9.0
 protobuf==5.28.2
-python-dotenv==1.0.1
 streamlit==1.39.0
 streamlit_analytics==0.4.1
 toml==0.10.2
