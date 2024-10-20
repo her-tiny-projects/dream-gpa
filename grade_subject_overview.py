@@ -25,11 +25,16 @@ if 'grade_upload' not in st.session_state:
        st.session_state.grade_upload = empty_table
 if 'syllabus_upload' not in st.session_state:
        st.session_state.syllabus_upload = empty_table
-
+if 'grade_master_data' not in st.session_state:
+       st.session_state.grade_master_data = empty_table
+if 'syllabus_master_data' not in st.session_state:
+       st.session_state.syllabus_master_data = empty_table
+if 'current_max_credit' not in st.session_state:
+       st.session_state.current_max_credit = 0
 
 if st.session_state.grade_upload.empty == False:
-       grade_master_data = grade_xlsx2df.convert_xlsx2df(st.session_state.grade_upload)
-       st.session_state.grade_master_data = grade_master_data
+       st.session_state.grade_master_data = grade_xlsx2df.convert_xlsx2df(st.session_state.grade_upload)
+       grade_master_data = st.session_state.grade_master_data
        st.markdown('### BẢNG ĐIỂM')
        st.dataframe(grade_master_data.set_index(grade_master_data.columns[4]))
 
@@ -38,3 +43,5 @@ if st.session_state.syllabus_upload.empty == False:
        syllabus_master_data = st.session_state.syllabus_master_data
        st.markdown('### CHƯƠNG TRÌNH ĐÀO TẠO')
        st.dataframe(syllabus_master_data.set_index(syllabus_master_data.columns[3]))
+
+st.session_state.current_max_credit = grade_master_data['Số tín chỉ tích lũy'].max()

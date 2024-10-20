@@ -165,10 +165,10 @@ if st.session_state.grade_master_data.empty == False:
                      CASE WHEN "Số tín chỉ đăng ký trong kỳ" IS NULL THEN 0 ELSE "Số tín chỉ đăng ký trong kỳ" END AS "Số tín chỉ đăng ký trong kỳ",
                      CASE WHEN "Số tín chỉ tích lũy trong kỳ" IS NULL THEN 0 ELSE "Số tín chỉ tích lũy trong kỳ" END AS "Số tín chỉ tích lũy trong kỳ",
                      "Số tín chỉ tích lũy lũy kế",
-                     SUM("Số tín chỉ đăng ký trong kỳ") OVER (ORDER BY term_order ASC) AS "Số tín chỉ đăng ký lũy kế"
+                     SUM("Số tín chỉ đăng ký trong kỳ") OVER (ORDER BY term_order ASC, "Học kỳ đăng ký học" ASC) AS "Số tín chỉ đăng ký lũy kế"
               FROM registered_credit
               LEFT JOIN eligible_credit USING ("Học kỳ đăng ký học")
-              ORDER BY term_order
+              ORDER BY term_order, "Học kỳ đăng ký học"
               """
               credit_bysemester = duckdb.sql(q).df()
               x = credit_bysemester['Học kỳ đăng ký học']

@@ -9,6 +9,7 @@ from plotly import graph_objects as go
 from google.oauth2 import service_account
 from google.cloud import firestore
 import time
+import grade_xlsx2df, syllabus_xlsx2df
 
 
 
@@ -24,6 +25,10 @@ if 'grade_upload' not in st.session_state:
        st.session_state.grade_upload = empty_table
 if 'syllabus_upload' not in st.session_state:
        st.session_state.syllabus_upload = empty_table
+if 'grade_master_data' not in st.session_state:
+       st.session_state.grade_master_data = empty_table
+if 'syllabus_master_data' not in st.session_state:
+       st.session_state.syllabus_master_data = empty_table
 if 'start_button' not in st.session_state:
        st.session_state.start_button = False
 if 'english_mode' not in st.session_state:
@@ -35,7 +40,7 @@ language_index = {'grade_upload': ['### UPLOAD BẢNG ĐIỂM', '### UPLOAD YOUR
                   'grade_upload_des': ['Download bảng điểm ở ftugate và upload vào ô dưới:', 'Please attach your transcript from ftugate to the box below:'],
                   'syllabus_upload': ['### UPLOAD CHƯƠNG TRÌNH ĐÀO TẠO', '### UPLOAD YOUR CURRICULUM'],
                   'syllabus_upload_des': ['Download chương trình đào tạo ở ftugate và upload vào ô dưới:', 'Please attach your curriculum from ftugate to the box below:'],
-                  'template_error': ['File không đúng mẫu! Bạn kiểm tra xem file của mình có chưa các cột như mẫu dưới đây không nhé', "Incorrect file format! Please make sure your file contains columns as the template below"],
+                  'template_error': ['File không đúng mẫu! Bạn kiểm tra xem file của mình có chứa các cột như mẫu dưới đây không nhé', "Incorrect file format! Please make sure your file contains columns as the template below"],
                   'format_error': ['File không đúng định dạng Excel!', 'Incorrect file format! Only Excel is accepted!'],
                   'start_button': ['BẮT ĐẦU', 'START']}
 
@@ -138,7 +143,6 @@ if upload1==True and upload2==True:
 
        with submit_button[1]:
               start_button = st.button(language_index['start_button'][english_mode], use_container_width=True, key='start_button')
-
 
 
 streamlit_analytics.stop_tracking(firestore_key_file='db_key.json', firestore_collection_name='app_analytics')

@@ -22,12 +22,10 @@ if 'grade_master_data' not in st.session_state:
        st.session_state.grade_master_data = empty_table
 if 'syllabus_master_data' not in st.session_state:
        st.session_state.syllabus_master_data = empty_table
-if  'max_credit' not in st.session_state:
-       st.session_state.max_credit = None
-if 'target_gpa' not in st.session_state:
-       st.session_state.target_gpa = None
 if 'subject_registered' not in st.session_state:
        st.session_state.subject_registered = empty_table
+if 'current_max_credit' not in st.session_state:
+       st.session_state.current_max_credit = 0
 
 # 4 CRITERIA:
        # all subject
@@ -83,18 +81,13 @@ if st.session_state.grade_master_data.empty == False and st.session_state.syllab
 
 
        st.markdown("""## 1. ĐĂNG KÝ MÔN HỌC""")
-       input1, blank, input2 = st.columns((1, 0.2, 1))
+       input1, input2 = st.columns((2, 1))
        with input1:
-              max_credit_input = st.number_input('#### :small_orange_diamond: Nhập tổng số tín chỉ cần tích lũy:', min_value=0, value=None)
-              if max_credit_input != None:
-                     st.session_state.max_credit = max_credit_input
-              st.write('Số tín chỉ của chương trình học (không tính quốc phòng, thể chất): ', max_credit_input)
-
-       with input2:
-              target_gpa_input = st.number_input('#### :small_orange_diamond: Nhập GPA mục tiêu (thang 4)', min_value=0.00, max_value=4.00, value=None)
-              if target_gpa_input != None:
-                     st.session_state.target_gpa = target_gpa_input
-              st.write('GPA mục tiêu: ', target_gpa_input)
+              cols = st.columns((3,1))
+              with cols[0]:
+                     st.markdown('#### :small_orange_diamond: Nhập GPA mục tiêu (thang 4)')
+                     target_gpa_input = st.number_input('*GPA mục tiêu không tính quốc phòng, thể chất*', min_value=0.00, max_value=4.00, value=None)
+                     st.write('Bạn đã nhập GPA mục tiêu là:', target_gpa_input)
 
 
        st.markdown('#### :small_orange_diamond: Tick chọn các môn bạn dự kiến học:')
@@ -109,7 +102,7 @@ if st.session_state.grade_master_data.empty == False and st.session_state.syllab
               index=['Mã môn học'])
        empty_registered_table.drop(empty_registered_table.index, inplace=True)
        # 1. MANDATORY:
-       if st.session_state.max_credit and st.session_state.target_gpa:
+       if target_gpa_input:
               q = """
                      SELECT 
                             *
@@ -189,7 +182,7 @@ if st.session_state.grade_master_data.empty == False and st.session_state.syllab
                             """
                             mandatory_subject_registered1 = duckdb.sql(q).df()
                             mandatory_credit_registered1 = mandatory_subject_registered1['Số tín chỉ'].sum()
-                            st.write(f'*Đã chọn: :red[**{int(mandatory_credit_registered1)}/{int(mandatory_credit_tolearn)}**] tín chỉ*')
+                            st.write(f'*Đã chọn: :red[**{int(mandatory_credit_registered1)}**] tín chỉ*')
 
 
               with mandatory2:
@@ -228,11 +221,11 @@ if st.session_state.grade_master_data.empty == False and st.session_state.syllab
                             """
                             mandatory_subject_registered2 = duckdb.sql(q).df()
                             mandatory_credit_registered2 = mandatory_subject_registered2['Số tín chỉ'].sum()
-                            st.write(f'*Đã chọn: :red[**{int(mandatory_credit_registered2)}/{int(mandatory_credit_relearn)}**] tín chỉ*')
+                            st.write(f'*Đã chọn: :red[**{int(mandatory_credit_registered2)}**] tín chỉ*')
 
 
        # 2. THESIS       
-       if st.session_state.max_credit and st.session_state.target_gpa:
+       if target_gpa_input:
               # note: check xem ở chuyên ngành khác thì nhóm học phần tốt nghiệp có = 9 --> không --> dựa vào keyword   
               with thesis1:
                      q = """
@@ -300,7 +293,7 @@ if st.session_state.grade_master_data.empty == False and st.session_state.syllab
 
 
        # 3. ELECTIVE
-       if st.session_state.max_credit and st.session_state.target_gpa:
+       if target_gpa_input:
               q = """
                      SELECT 
                             *
@@ -309,7 +302,6 @@ if st.session_state.grade_master_data.empty == False and st.session_state.syllab
                      AND "Nhóm" != 9
               """
               elective_subject = duckdb.sql(q).df()
-              max_elective_credit = max(0, st.session_state.max_credit - max_mandatory_credit - thesis_credit)
 
        #note: elective bị dồn về nhóm 2 thì sao???? --> kệ, người dùng phải tự sắp xếp
               q = """
@@ -320,10 +312,9 @@ if st.session_state.grade_master_data.empty == False and st.session_state.syllab
                      WHERE "Đã học" IS NOT NULL
               """
               accumulated_elective_subject = duckdb.sql(q).df()
-              accumulated_elective_credit = accumulated_elective_subject["Tín chỉ tự chọn tích lũy"].max()
 
-              st.write(accumulated_elective_credit)
-              elective_credit_tolearn = max(0, max_elective_credit - accumulated_elective_credit) # number of elective credits available to learn/ relearn to maximize grade
+              # accumulated_elective_credit = accumulated_elective_subject["Tín chỉ tự chọn tích lũy"].max()
+              # elective_credit_tolearn = max(0, max_elective_credit - accumulated_elective_credit) # number of elective credits available to learn/ relearn to maximize grade
 
               q = """
                      SELECT
@@ -348,8 +339,7 @@ if st.session_state.grade_master_data.empty == False and st.session_state.syllab
                             "Số tín chỉ",
                             "Điểm TK (C)"
                      FROM accumulated_elective_subject
-                     WHERE "Điểm TK (C)" IN ('D', 'F')   
-                     AND "Tín chỉ tự chọn tích lũy" <= {max_elective_credit}
+                     WHERE "Điểm TK (C)" IN ('D', 'F') 
                      ORDER BY "Học kỳ đăng ký học"
               """
               elective_subject_relearn = duckdb.sql(q).df()
@@ -357,33 +347,23 @@ if st.session_state.grade_master_data.empty == False and st.session_state.syllab
               # D --> relearn; F --> relearn or replaced by another elective subject
               # ==> overall,  have to relearn both D, F to improve GPA
 
-              elective_credit_remaining = elective_credit_tolearn + elective_credit_relearn
+              # elective_credit_remaining = elective_credit_tolearn + elective_credit_relearn
 
               with elective1:
                      st.info('###### Học phần Tự chọn')
                      st.markdown(f':small_orange_diamond: Môn tự chọn có thể học')
-                     #check available elective credits to register
-                     if elective_credit_tolearn == 0: # if completed
-                            elective_subject_tolearn.drop(elective_subject_tolearn.index, inplace=True)
-                            st.dataframe(
-                                   elective_subject_tolearn,
-                                   hide_index=True,
-                                   height=170,
-                                   use_container_width=True)
-
-                     else:
-                            elective_subject_tolearn = st.data_editor(
-                                   elective_subject_tolearn,
-                                   column_config={
-                                          'Checkbox': st.column_config.CheckboxColumn(
-                                                 help='Tick vào môn bạn **dự kiến** học',
-                                                 default=False
-                                          )
-                                   },
-                                   disabled=['Mã môn học', 'Tên môn học', 'Nhóm', 'Số tín chỉ'],
-                                   hide_index=True,
-                                   height=170,
-                                   use_container_width=True)
+                     elective_subject_tolearn = st.data_editor(
+                            elective_subject_tolearn,
+                            column_config={
+                                   'Checkbox': st.column_config.CheckboxColumn(
+                                          help='Tick vào môn bạn **dự kiến** học',
+                                          default=False
+                                   )
+                            },
+                            disabled=['Mã môn học', 'Tên môn học', 'Nhóm', 'Số tín chỉ'],
+                            hide_index=True,
+                            height=170,
+                            use_container_width=True)
 
                      if elective_subject_tolearn.empty == True:
                             elective_subject_registered1 = empty_registered_table
@@ -397,9 +377,7 @@ if st.session_state.grade_master_data.empty == False and st.session_state.syllab
                             """
                             elective_subject_registered1 = duckdb.sql(q).df()
                             elective_credit_registered1 = elective_subject_registered1['Số tín chỉ'].sum()
-                            st.write(f'*Đã chọn: :red[**{int(elective_credit_registered1)}/{int(elective_credit_tolearn)}**] tín chỉ*')
-                            if int(elective_credit_registered1) > int(elective_credit_tolearn):
-                                   st.error('Bạn đã chọn quá số lượng tín chỉ Tự chọn có thể học! \nHãy bỏ tick một số môn học nhé!')
+                            st.write(f'*Đã chọn: :red[**{int(elective_credit_registered1)}**] tín chỉ*')
 
 
               with elective2:
@@ -440,12 +418,32 @@ if st.session_state.grade_master_data.empty == False and st.session_state.syllab
                             """
                             elective_subject_registered2 = duckdb.sql(q).df()
                             elective_credit_registered2 = elective_subject_registered2['Số tín chỉ'].sum()
-                            st.write(f'*Đã chọn: :red[**{int(elective_credit_registered2)}/{int(elective_credit_relearn)}**] tín chỉ*')
-                            if int(elective_credit_registered2) > int(elective_credit_relearn):
-                                   st.error('Bạn đã chọn quá số lượng tín Tự chọn có thể học lại, học cải thiện/ thay thế! \nHãy bỏ tick một số môn học nhé!')
+                            st.write(f'*Đã chọn: :red[**{int(elective_credit_registered2)}**] tín chỉ*')
 
               total_credit_registered = mandatory_credit_registered1 + mandatory_credit_registered2 + thesis_credit_registered + elective_credit_registered1 + elective_credit_registered2
 
+       with input2:
+              current_max_credit = round(st.session_state.current_max_credit)
+              try:
+                     content = f"""
+                            ---
+                            **TỔNG SỐ TÍN CHỈ:** :red[**{current_max_credit
+                            +total_credit_registered}**]
+                            - Số tín chỉ đã chọn: :red[**{total_credit_registered}**]
+                            - Số tín chỉ đã tích lũy: :red[**{current_max_credit}**]
+                            ---
+                            """
+                     st.markdown(content)
+              except:
+                     content = f"""
+                            ---
+                            **TỔNG SỐ TÍN CHỈ:** :red[**{current_max_credit}**]
+                            - Số tín chỉ đã chọn: :red[**-/-**]
+                            - Số tín chỉ đã tích lũy: :red[**{current_max_credit}**]
+                            ---
+                            """
+                     st.markdown(content)
+              #note: remind người dùng xem Tổng số tín chỉ dự kiến tích lũy ở đây có vượt quá số tín chỉ của chương trình học không
 
        st.markdown("""## 2. KẾ HOẠCH HỌC TẬP""")
        content = """
@@ -460,7 +458,7 @@ if st.session_state.grade_master_data.empty == False and st.session_state.syllab
               """
        st.markdown(content)
        blank1, scenario, blank2 = st.columns((1,4,1))
-       if st.session_state.max_credit == None or st.session_state.target_gpa == None or int(thesis_credit_registered) > int(thesis_credit_remaining) or int(elective_credit_registered1) > int(elective_credit_tolearn) or  int(elective_credit_registered2) > int(elective_credit_relearn) or total_credit_registered==0:
+       if target_gpa_input == None or int(thesis_credit_registered) > int(thesis_credit_remaining) or int(elective_credit_registered2) > int(elective_credit_relearn) or total_credit_registered==0:
               content = """
                      Để phần Kế hoạch học tập dưới đây hiện ra, bạn cần hoàn thiện Mục 1. Thử kiểm tra xem:
                      - Đã điền đúng Số tín chỉ chương trình học của bạn chưa
@@ -471,7 +469,7 @@ if st.session_state.grade_master_data.empty == False and st.session_state.syllab
        else:
 
               content = f"""
-                     Bạn dự kiến đăng ký học :red[**{total_credit_registered} tín chỉ**]. Dưới đây là các kịch bản để đạt :red[**TỐI THIỂU GPA = {st.session_state.target_gpa}**]:
+                     Bạn dự kiến đăng ký học :red[**{total_credit_registered} tín chỉ**]. Dưới đây là các kịch bản để đạt :red[**TỐI THIỂU GPA = {target_gpa_input}**]:
                      """
               scenario.write(content)
 
@@ -565,7 +563,7 @@ if st.session_state.grade_master_data.empty == False and st.session_state.syllab
                                    else:
                                           credit_grade_tobe_accumulated = 4*x+3*y+2*z
                                           target_gpa_calculate = (credit_grade_tobe_accumulated+credit_grade_accumulated)/credit_calculate_gpa
-                                          if target_gpa_calculate >= st.session_state.target_gpa and x in sum_sublist and y in sum_sublist and z in sum_sublist:
+                                          if target_gpa_calculate >= target_gpa_input and x in sum_sublist and y in sum_sublist and z in sum_sublist:
                                                  gradeA.append(x)
                                                  gradeB.append(y)
                                                  gradeC.append(z)

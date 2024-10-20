@@ -55,10 +55,6 @@ if 'grade_master_data' not in st.session_state:
        st.session_state.grade_master_data = empty_table
 if 'syllabus_master_data' not in st.session_state:
        st.session_state.syllabus_master_data = empty_table
-if  'max_credit' not in st.session_state:
-       st.session_state.max_credit = None
-if 'target_gpa' not in st.session_state:
-       st.session_state.target_gpa = None
 if 'english_mode' not in st.session_state:
        st.session_state.english_mode = None
 
@@ -81,7 +77,7 @@ feedback = st.Page('feedback.py', title=langugage_index['feedback'][english_mode
 
 
 if st.session_state.grade_upload.empty==False and st.session_state.syllabus_upload.empty==False:
-       page = st.navigation([intro_n_contact, grade_subject_overview, visualization, gpa_planning, feedback])
+       page = st.navigation([grade_subject_overview, visualization, gpa_planning, feedback])
 
        def change_onclick():
               st.session_state.grade_upload = empty_table
@@ -97,7 +93,7 @@ if st.session_state.grade_upload.empty==False and st.session_state.syllabus_uplo
 
 
 else:
-       if (st.session_state.grade_upload_fail>=3) or (st.session_state.syllabus_upload_fail>=3):
+       if (st.session_state.grade_upload_fail>=2) or (st.session_state.syllabus_upload_fail>=2):
               page = st.navigation([bug_report])
        else:
               page = st.navigation([intro_n_contact, upload_login])
