@@ -467,128 +467,130 @@ if st.session_state.grade_master_data.empty == False and st.session_state.syllab
                      """
               scenario.warning(content)
        else:
+              temp = st.columns(7)
+              temp[3].button('CLICK TO CHECK', key='check_gpa')
+              if st.session_state.check_gpa==True:
+                     content = f"""
+                            Bạn dự kiến đăng ký học :red[**{total_credit_registered} tín chỉ**]. Dưới đây là các kịch bản để đạt :red[**TỐI THIỂU GPA = {target_gpa_input}**]:
+                            """
+                     scenario.write(content)
 
-              content = f"""
-                     Bạn dự kiến đăng ký học :red[**{total_credit_registered} tín chỉ**]. Dưới đây là các kịch bản để đạt :red[**TỐI THIỂU GPA = {target_gpa_input}**]:
+                     # ALL SUBJECT REGISTERED TO LEARN
+                     q = """
+                            SELECT * FROM mandatory_subject_registered1
+                            UNION ALL
+                            SELECT * FROM mandatory_subject_registered2
+                            UNION ALL
+                            SELECT * FROM thesis_subject_registered
+                            UNION ALL
+                            SELECT * FROM elective_subject_registered1
+                            UNION ALL
+                            SELECT * FROM elective_subject_registered2
                      """
-              scenario.write(content)
-
-              # ALL SUBJECT REGISTERED TO LEARN
-              q = """
-                     SELECT * FROM mandatory_subject_registered1
-                     UNION ALL
-                     SELECT * FROM mandatory_subject_registered2
-                     UNION ALL
-                     SELECT * FROM thesis_subject_registered
-                     UNION ALL
-                     SELECT * FROM elective_subject_registered1
-                     UNION ALL
-                     SELECT * FROM elective_subject_registered2
-              """
-              subject_registered = duckdb.sql(q).df()
+                     subject_registered = duckdb.sql(q).df()
 
 
-              q = """
-                     WITH temp1 AS
-                            (SELECT 
-                                   "Mã môn học",
-                                   "Số tín chỉ",
-                                   "Điểm TK (4)"
-                            FROM syllabus_grade_master_data
-                            WHERE CAST("Mã môn học" AS VARCHAR) NOT IN 
-                                   (SELECT CAST("Mã môn học" AS VARCHAR) FROM subject_registered)
-                            AND "Điểm TK (4)" IS NOT NULL
-                            ),
+                     q = """
+                            WITH temp1 AS
+                                   (SELECT 
+                                          "Mã môn học",
+                                          "Số tín chỉ",
+                                          "Điểm TK (4)"
+                                   FROM syllabus_grade_master_data
+                                   WHERE CAST("Mã môn học" AS VARCHAR) NOT IN 
+                                          (SELECT CAST("Mã môn học" AS VARCHAR) FROM subject_registered)
+                                   AND "Điểm TK (4)" IS NOT NULL
+                                   ),
 
-                     temp2 AS
-                            (SELECT
-                                   "Mã môn học",
-                                   "Số tín chỉ",
-                                   '' "Điểm TK (4)"
-                            FROM subject_registered
-                            )
+                            temp2 AS
+                                   (SELECT
+                                          "Mã môn học",
+                                          "Số tín chỉ",
+                                          '' "Điểm TK (4)"
+                                   FROM subject_registered
+                                   )
 
-                     (SELECT * FROM temp1
-                     UNION ALL
-                     SELECT * FROM temp2)
-              """
-              subject_calculate_gpa = duckdb.sql(q).df()
-              subject_calculate_gpa['Điểm TK (4)'] = subject_calculate_gpa['Điểm TK (4)'].apply(lambda x: int(float(x)) if x != '' else np.nan)
-              subject_calculate_gpa['Tín chỉ x Điểm'] = subject_calculate_gpa['Số tín chỉ']*subject_calculate_gpa['Điểm TK (4)']
-
-
-              credit_calculate_gpa = subject_calculate_gpa['Số tín chỉ'].sum()
-              credit_grade_accumulated = subject_calculate_gpa['Tín chỉ x Điểm'].sum()
-              # credit_grade_tobe_accumulated = target_gpa*credit_calculate_gpa - credit_grade_accumulated
-              credit_tobe_accumulated = subject_registered['Số tín chỉ'].sum()
+                            (SELECT * FROM temp1
+                            UNION ALL
+                            SELECT * FROM temp2)
+                     """
+                     subject_calculate_gpa = duckdb.sql(q).df()
+                     subject_calculate_gpa['Điểm TK (4)'] = subject_calculate_gpa['Điểm TK (4)'].apply(lambda x: int(float(x)) if x != '' else np.nan)
+                     subject_calculate_gpa['Tín chỉ x Điểm'] = subject_calculate_gpa['Số tín chỉ']*subject_calculate_gpa['Điểm TK (4)']
 
 
-              def sublist(mylist):
-                     n = len(mylist)
-                     sublist = []
-                     for start in range(n):
-                            for end in range(start+1, n+1):
-                                   item = mylist[start:end]
-                                   if item not in sublist:
-                                          sublist.append(item)
-                     return sublist
-              
-              def sum_sublist(sublist):
-                     sum_sublist = [0] # default value = 0: 0 có tín chỉ nào thỏa mãn
-                     for item in sublist:
-                            sum_ = sum(item)
-                            if sum_ not in sum_sublist:
-                                   sum_sublist.append(sum_)
-                     return sum_sublist
+                     credit_calculate_gpa = subject_calculate_gpa['Số tín chỉ'].sum()
+                     credit_grade_accumulated = subject_calculate_gpa['Tín chỉ x Điểm'].sum()
+                     # credit_grade_tobe_accumulated = target_gpa*credit_calculate_gpa - credit_grade_accumulated
+                     credit_tobe_accumulated = subject_registered['Số tín chỉ'].sum()
 
-              
-              mylist = subject_registered['Số tín chỉ'].tolist()
-              sublist = sublist(mylist)
-              sum_sublist = sum_sublist(sublist)
 
-              # X, Y, Z: no. credits in accordance with A(4), B(3), C(2) --> 0 <= X, Y, Z <= credit_tobe_accumulated
-              # credit_grade_tobe_accumulated = 4X + 3Y + 2Z
-              # credit_tobe_accumulated = X + Y + Z
-              # -credit_grade_tobe_accumulated + 4credit_tobe_accumulated = Y + 2Z
+                     def sublist(mylist):
+                            n = len(mylist)
+                            sublist = []
+                            for start in range(n):
+                                   for end in range(start+1, n+1):
+                                          item = mylist[start:end]
+                                          if item not in sublist:
+                                                 sublist.append(item)
+                            return sublist
 
-              gradeA = []
-              gradeB = []
-              gradeC = []
-              gpa = []
-              for x in range(0, credit_tobe_accumulated+1):
-                     for y in range(0, credit_tobe_accumulated+1):
-                            for z in range(0, credit_tobe_accumulated+1):
-                                   if (x+y+z) != credit_tobe_accumulated:
-                                          continue
-                                   else:
-                                          credit_grade_tobe_accumulated = 4*x+3*y+2*z
-                                          target_gpa_calculate = (credit_grade_tobe_accumulated+credit_grade_accumulated)/credit_calculate_gpa
-                                          if target_gpa_calculate >= target_gpa_input and x in sum_sublist and y in sum_sublist and z in sum_sublist:
-                                                 gradeA.append(x)
-                                                 gradeB.append(y)
-                                                 gradeC.append(z)
-                                                 gpa.append(target_gpa_calculate)
+                     def sum_sublist(sublist):
+                            sum_sublist = [0] # default value = 0: 0 có tín chỉ nào thỏa mãn
+                            for item in sublist:
+                                   sum_ = sum(item)
+                                   if sum_ not in sum_sublist:
+                                          sum_sublist.append(sum_)
+                            return sum_sublist
 
-              # for z in range(0, credit_tobe_accumulated+1):
-              #        y = (-1)*credit_grade_tobe_accumulated + 4*credit_tobe_accumulated - 2*z
-              #        y = ceil(y)
-              #        if y>0 and (y+z)<=credit_tobe_accumulated:
-              #               x = int(credit_tobe_accumulated - y - z)
-              #               gradeA.append(x)
-              #               gradeB.append(y)
-              #               gradeC.append(z)
 
-              df = pd.DataFrame({'Kịch bản': range(1, len(gradeA)+1),
-                            'Số tín chỉ A': gradeA,
-                            'Số tín chỉ B': gradeB,
-                            'Số tín chỉ C': gradeC,
-                            'GPA dự kiến': gpa
-                            })
-              
+                     mylist = subject_registered['Số tín chỉ'].tolist()
+                     sublist = sublist(mylist)
+                     sum_sublist = sum_sublist(sublist)
 
-              if df.empty == True:
-                     col = st.columns((1,4,1))
-                     col[1].warning('GPA này có vẻ như không thực hiện được rồi, bạn xem lại nhé :worried:')
-                     scenario.dataframe(df, hide_index=True, use_container_width=True)
-              else:
-                     scenario.dataframe(df.style.highlight_max(subset=['GPA dự kiến'], color='red'), hide_index=True, use_container_width=True)
+                     # X, Y, Z: no. credits in accordance with A(4), B(3), C(2) --> 0 <= X, Y, Z <= credit_tobe_accumulated
+                     # credit_grade_tobe_accumulated = 4X + 3Y + 2Z
+                     # credit_tobe_accumulated = X + Y + Z
+                     # -credit_grade_tobe_accumulated + 4credit_tobe_accumulated = Y + 2Z
+
+                     gradeA = []
+                     gradeB = []
+                     gradeC = []
+                     gpa = []
+                     for x in range(0, credit_tobe_accumulated+1):
+                            for y in range(0, credit_tobe_accumulated+1):
+                                   for z in range(0, credit_tobe_accumulated+1):
+                                          if (x+y+z) != credit_tobe_accumulated:
+                                                 continue
+                                          else:
+                                                 credit_grade_tobe_accumulated = 4*x+3*y+2*z
+                                                 target_gpa_calculate = (credit_grade_tobe_accumulated+credit_grade_accumulated)/credit_calculate_gpa
+                                                 if target_gpa_calculate >= target_gpa_input and x in sum_sublist and y in sum_sublist and z in sum_sublist:
+                                                        gradeA.append(x)
+                                                        gradeB.append(y)
+                                                        gradeC.append(z)
+                                                        gpa.append(target_gpa_calculate)
+
+                     # for z in range(0, credit_tobe_accumulated+1):
+                     #        y = (-1)*credit_grade_tobe_accumulated + 4*credit_tobe_accumulated - 2*z
+                     #        y = ceil(y)
+                     #        if y>0 and (y+z)<=credit_tobe_accumulated:
+                     #               x = int(credit_tobe_accumulated - y - z)
+                     #               gradeA.append(x)
+                     #               gradeB.append(y)
+                     #               gradeC.append(z)
+
+                     df = pd.DataFrame({'Kịch bản': range(1, len(gradeA)+1),
+                                   'Số tín chỉ A': gradeA,
+                                   'Số tín chỉ B': gradeB,
+                                   'Số tín chỉ C': gradeC,
+                                   'GPA dự kiến': gpa
+                                   })
+
+
+                     if df.empty == True:
+                            col = st.columns((1,4,1))
+                            col[1].warning('GPA này có vẻ như không thực hiện được rồi, bạn xem lại nhé :worried:')
+                            scenario.dataframe(df, hide_index=True, use_container_width=True)
+                     else:
+                            scenario.dataframe(df.style.highlight_max(subset=['GPA dự kiến'], color='red'), hide_index=True, use_container_width=True)
