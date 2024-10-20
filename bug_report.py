@@ -4,7 +4,7 @@ from google.cloud import firestore
 import json
 import time
 from datetime import datetime
-
+import pytz
 
 
 # CONNECT WITH FIREBASE DB
@@ -41,7 +41,7 @@ with cols[1]:
             st.info(language_index['notification'][english_mode])
             st.markdown(language_index['form_name'][english_mode])
             form_id = str(round(time.time()))
-            form_date = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+            form_date = datetime.today(pytz.timezone('Etc/GMT+7')).strftime('%Y-%m-%d %H:%M:%S')
             report_email = st.text_input(language_index['email'][english_mode])
             report_content = st.text_area(language_index['description'][english_mode])
             sub_cols = st.columns(3)

@@ -11,6 +11,7 @@ from google.cloud import firestore
 import json, toml
 import time
 from datetime import datetime
+import pytz
 # from dotenv import load_dotenv
 # import os
 
@@ -37,7 +38,7 @@ with form:
        with st.form(key='feedback_form', clear_on_submit=True):
               st.markdown('# :envelope: GÓC GÓP Ý')
               form_id = str(round(time.time()))
-              form_date = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+              form_date = datetime.today(pytz.timezone('Etc/GMT+7')).strftime('%Y-%m-%d %H:%M:%S')
               form_rating_usefull = st.slider(label='Mức độ hữu ích:red[*]', min_value=0, max_value=5, help='Có phục vụ bạn trong việc theo dõi kết quả và lên kế hoạch học tập không (Điểm từ 1-5):\n\n1 - Không hữu ích\n\n2 - Có một chút hữu ích\n\n3 - Khá hữu ích\n\n4 - Hữu ích\n\n5 - Rất hữu ích')
               form_rating_userfriendly = st.slider(label='Mức độ dễ sử dụng:red[*]', min_value=0, 
               max_value=5, step=1, help='Bạn có thấy công cụ dễ sử dụng, thao tác không (Điểm từ 1-5):\n\n1 - Rất khó sử dụng\n\n2 - Khó sử dụng\n\n3 - Trung bình\n\n4 - Dễ sử dụng\n\n5 - Rất dễ sử dụng')

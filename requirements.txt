@@ -7,3 +7,4 @@ protobuf==5.28.2
 streamlit==1.39.0
 streamlit_analytics==0.4.1
 toml==0.10.2
+pytz==2023.3.post1
