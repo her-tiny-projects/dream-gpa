@@ -85,7 +85,7 @@ with user_upload[1]:
        st.markdown(language_index['grade_upload'][english_mode])
        grade_upload = st.file_uploader(language_index['grade_upload_des'][english_mode])
        if grade_upload:
-              # try:
+              try:
                      grade_upload = pd.read_excel(grade_upload)
                      # check unordered list of grade template columns in unordered list of grade upload columns
                      check = []
@@ -99,8 +99,8 @@ with user_upload[1]:
                      if False not in check:
                             st.session_state.grade_upload = grade_upload
                             upload1 = True
-              # except:
-              #        st.error(language_index['format_error'][english_mode])
+              except:
+                     st.error(language_index['format_error'][english_mode])
 
 # huhu xem lại phần tracking --> done
 # layout

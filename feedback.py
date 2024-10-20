@@ -27,7 +27,6 @@ from datetime import datetime
 
 db_key = open('db_key.json')
 key_dict = json.load(db_key)
-
 creds = service_account.Credentials.from_service_account_info(key_dict)
 db = firestore.Client(credentials=creds)
 

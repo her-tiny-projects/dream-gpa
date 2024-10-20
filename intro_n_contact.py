@@ -54,12 +54,12 @@ notice_en = '### NOTICE:'
 
 notice_content_vn = """
        - Dự án chỉ phục vụ mục đích học tập, không thu phí và không thu thập bất cứ dữ liệu điểm, chương trình đào tạo của người dùng
-       - Trang web có link ...... và có video hướng dẫn, kiểm tra tính chính xác của đường link trước khi truy cập
+       - Trang web có link: :blue[https://dream-gpa.onrender.com/] và có video hướng dẫn, kiểm tra tính chính xác của đường link trước khi truy cập
        """
 
 notice_content_en = """
        - This project is solely for educational purposes. No fee. No user data collection regarding users' grades or academic programs  
-       - Link to access this website: ........................ Please double-check the link before uploading any files.
+       - Link to access this website: :blue[https://dream-gpa.onrender.com/]. Please double-check the link before uploading any files.
        """
 
 

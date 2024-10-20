@@ -8,18 +8,17 @@ from datetime import datetime
 
 
 # CONNECT WITH FIREBASE DB
-key_dict = json.loads(st.secrets['credentials']) # streamlit load key.toml --> toml strings = json strings --> json.loads (to load json strings)
+# key_dict = json.loads(st.secrets['credentials']) # streamlit load key.toml --> toml strings = json strings --> json.loads (to load json strings)
+# creds = service_account.Credentials.from_service_account_info(key_dict)
+# db = firestore.Client(credentials=creds)
+
+
+db_key = open('db_key.json')
+key_dict = json.load(db_key)
 creds = service_account.Credentials.from_service_account_info(key_dict)
 db = firestore.Client(credentials=creds)
 
 
-# # PAGE CONFIG
-# st.set_page_config(
-#        page_title='Báo lỗi',
-#        layout='wide',
-#        initial_sidebar_state='expanded'
-
-# )
 
 if 'english_mode' not in st.session_state:
     st.session_state.english_mode = 0
