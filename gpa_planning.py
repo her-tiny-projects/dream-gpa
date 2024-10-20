@@ -321,6 +321,8 @@ if st.session_state.grade_master_data.empty == False and st.session_state.syllab
               """
               accumulated_elective_subject = duckdb.sql(q).df()
               accumulated_elective_credit = accumulated_elective_subject["Tín chỉ tự chọn tích lũy"].max()
+
+              st.write(accumulated_elective_credit)
               elective_credit_tolearn = max(0, max_elective_credit - accumulated_elective_credit) # number of elective credits available to learn/ relearn to maximize grade
 
               q = """
