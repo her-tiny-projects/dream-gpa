@@ -46,6 +46,7 @@ if st.session_state.grade_master_data.empty == False and st.session_state.syllab
                             "Điểm TK (4)",
                             DENSE_RANK() OVER (PARTITION BY "Mã môn học" ORDER BY "Điểm TK (4)" DESC) AS MAX_GRADE
                      FROM grade_master_data
+                     WHERE "Điểm TK (C)" IS NOT NULL -- Bỏ các môn đã đăng ký nhưng chưa học/ chưa có điểm
                      ),
 
               max_grade_subject_learned AS (
@@ -143,7 +144,6 @@ if st.session_state.grade_master_data.empty == False and st.session_state.syllab
               mandatory_subject_relearn = duckdb.sql(q).df()
               mandatory_credit_relearn = mandatory_subject_relearn['Số tín chỉ'].sum()
 
-              mandatory_credit_remaining = mandatory_credit_tolearn + mandatory_credit_relearn
 
               with mandatory1:
                      st.info(f'###### Học phần Bắt buộc')
@@ -425,12 +425,14 @@ if st.session_state.grade_master_data.empty == False and st.session_state.syllab
        with input2:
               current_max_credit = round(st.session_state.current_max_credit)
               try:
+
+                     total_credit_registered_notDF = mandatory_credit_registered1 + thesis_credit_registered + elective_credit_registered1
                      content = f"""
                             ---
                             **TỔNG SỐ TÍN CHỈ:** :red[**{current_max_credit
                             +total_credit_registered}**]
-                            - Số tín chỉ đã chọn: :red[**{total_credit_registered}**]
-                            - Số tín chỉ đã tích lũy: :red[**{current_max_credit}**]
+                            - Số tín chỉ đã tick chọn (không bao gồm môn D, F): :red[**{total_credit_registered}**]
+                            - Số tín chỉ đã tích lũy (bao gồm cả môn D, F): :red[**{current_max_credit}**]
                             ---
                             """
                      st.markdown(content)
@@ -457,7 +459,7 @@ if st.session_state.grade_master_data.empty == False and st.session_state.syllab
               ---
               """
        st.markdown(content)
-       blank1, scenario, blank2 = st.columns((1,4,1))
+       blank1, scenario, blank2 = st.columns((1,7,1))
        if target_gpa_input == None or int(thesis_credit_registered) > int(thesis_credit_remaining) or int(elective_credit_registered2) > int(elective_credit_relearn) or total_credit_registered==0:
               content = """
                      Để phần Kế hoạch học tập dưới đây hiện ra, bạn cần hoàn thiện Mục 1. Thử kiểm tra xem:
@@ -554,8 +556,11 @@ if st.session_state.grade_master_data.empty == False and st.session_state.syllab
                      # -credit_grade_tobe_accumulated + 4credit_tobe_accumulated = Y + 2Z
 
                      gradeA = []
+                     subjectA = []
                      gradeB = []
+                     subjectB = []
                      gradeC = []
+                     subjectC = []
                      gpa = []
                      for x in range(0, credit_tobe_accumulated+1):
                             for y in range(0, credit_tobe_accumulated+1):
@@ -567,8 +572,11 @@ if st.session_state.grade_master_data.empty == False and st.session_state.syllab
                                                  target_gpa_calculate = (credit_grade_tobe_accumulated+credit_grade_accumulated)/credit_calculate_gpa
                                                  if target_gpa_calculate >= target_gpa_input and x in sum_sublist and y in sum_sublist and z in sum_sublist:
                                                         gradeA.append(x)
+                                                        subjectA.append(x/3)
                                                         gradeB.append(y)
+                                                        subjectB.append(y/3)
                                                         gradeC.append(z)
+                                                        subjectC.append(z/3)
                                                         gpa.append(target_gpa_calculate)
 
                      # for z in range(0, credit_tobe_accumulated+1):
@@ -579,18 +587,28 @@ if st.session_state.grade_master_data.empty == False and st.session_state.syllab
                      #               gradeA.append(x)
                      #               gradeB.append(y)
                      #               gradeC.append(z)
-
                      df = pd.DataFrame({'Kịch bản': range(1, len(gradeA)+1),
                                    'Số tín chỉ A': gradeA,
                                    'Số tín chỉ B': gradeB,
                                    'Số tín chỉ C': gradeC,
                                    'GPA dự kiến': gpa
                                    })
-
-
+                     df2 = pd.DataFrame({'Kịch bản': range(1, len(gradeA)+1),
+                                   'Số môn A (3 tín chỉ)': subjectA,
+                                   'Số môn B (3 tín chỉ)': subjectB,
+                                   'Số môn C (3 tín chỉ)': subjectC,
+                                   'GPA dự kiến': gpa
+                                   })
                      if df.empty == True:
                             col = st.columns((1,4,1))
                             col[1].warning('GPA này có vẻ như không thực hiện được rồi, bạn xem lại nhé :worried:')
                             scenario.dataframe(df, hide_index=True, use_container_width=True)
                      else:
-                            scenario.dataframe(df.style.highlight_max(subset=['GPA dự kiến'], color='red'), hide_index=True, use_container_width=True)
+                            scenario = st.columns((3,0.3,3))
+                            with scenario[0]:
+                                   st.markdown('Các khả năng về số tín chỉ A, B, C')
+                                   st.dataframe(df.style.highlight_max(subset=['GPA dự kiến'], color='red'), hide_index=True, use_container_width=True)
+
+                            with scenario[2]:
+                                   st.markdown('Quy đổi sang số môn (tương đương 3 tín chỉ)')
+                                   st.dataframe(df2.style.highlight_max(subset=['GPA dự kiến'], color='red').format(subset=['Số môn A (3 tín chỉ)', 'Số môn B (3 tín chỉ)', 'Số môn C (3 tín chỉ)'], formatter='{:.1f}'), hide_index=True, use_container_width=True)
