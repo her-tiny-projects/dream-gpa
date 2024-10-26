@@ -462,10 +462,9 @@ if st.session_state.grade_master_data.empty == False and st.session_state.syllab
        blank1, scenario, blank2 = st.columns((1,7,1))
        if target_gpa_input == None or int(thesis_credit_registered) > int(thesis_credit_remaining) or int(elective_credit_registered2) > int(elective_credit_relearn) or total_credit_registered==0:
               content = """
-                     Để phần Kế hoạch học tập dưới đây hiện ra, bạn cần hoàn thiện Mục 1. Thử kiểm tra xem:
-                     - Đã điền đúng Số tín chỉ chương trình học của bạn chưa
-                     - Đã điền đúng GPA mục tiêu chưa
-                     - Số tín chỉ Tick chọn cho mỗi loại học phần có vượt quá số lượng cho phép 
+                     Để phần Kế hoạch học tập dưới đây hiện ra, bạn cần hoàn thiện Mục 1. Kiểm tra xem:
+                     - Đã điền vào ô GPA mục tiêu chưa
+                     - Đã tick đủ các môn dự kiến học chưa
                      """
               scenario.warning(content)
        else:
