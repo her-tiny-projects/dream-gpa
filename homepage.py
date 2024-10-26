@@ -23,7 +23,7 @@ st.set_page_config(
 )
 
 
-st.logo(image='dream_gpa_logo.png', icon_image='dream_gpa_icon.png', size='medium')
+st.logo(image='assets/dream_gpa_logo.png', icon_image='assets/dream_gpa_icon.png', size='medium')
 
 # 1. language mode
 langugage_index = {'welcome': ['Xin chào', 'Welcome'],

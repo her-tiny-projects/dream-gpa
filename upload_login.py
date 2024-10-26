@@ -42,7 +42,11 @@ language_index = {'grade_upload': ['### UPLOAD BẢNG ĐIỂM', '### UPLOAD YOUR
                   'syllabus_upload_des': ['Download chương trình đào tạo ở ftugate và upload vào ô dưới:', 'Please attach your curriculum from ftugate to the box below:'],
                   'template_error': ['File không đúng mẫu! Bạn kiểm tra xem file của mình có chứa các cột như mẫu dưới đây không nhé', "Incorrect file format! Please make sure your file contains columns as the template below"],
                   'format_error': ['File không đúng định dạng Excel!', 'Incorrect file format! Only Excel is accepted!'],
-                  'start_button': ['BẮT ĐẦU', 'START']}
+                  'start_button': ['BẮT ĐẦU', 'START'],
+                  'grade_sample': ['Download mẫu bảng điểm', 'Download transcript sample'],
+                  'grade_sample_name': ['DiemMau.xlsx', 'TranscriptSample.xlsx'],
+                  'syllabus_sample': ['Download mẫu chương trình đào tạo', 'Download curriculum sample'],
+                  'syllabus_sample_name': ['ChuongTrinhDaoTaoSample.xlsx', 'CurriculumSample.xlsx'],}
 
 # 2. LOGIN --> check
 streamlit_analytics.start_tracking(firestore_key_file='db_key.json', firestore_collection_name='app_metrics')
@@ -144,5 +148,25 @@ if upload1==True and upload2==True:
        with submit_button[1]:
               start_button = st.button(language_index['start_button'][english_mode], use_container_width=True, key='start_button')
 
+sample = st.columns((1,4,1))
+with sample[1]:
+       st.markdown("""
+              ---
+              """)
+       with open('data_sample/DiemMau.xlsx', 'rb') as grade_sample:
+              st.download_button(
+                     label=language_index['grade_sample'][english_mode],
+                     data=grade_sample,
+                     file_name=language_index['grade_sample_name'][english_mode],
+                     mime='application/vnd.ms-excel'
+              )
+
+       with open('data_sample/ChuongTrinhDaoTaoMau.xlsx', 'rb') as grade_sample:
+              st.download_button(
+                     label=language_index['syllabus_sample'][english_mode],
+                     data=grade_sample,
+                     file_name=language_index['syllabus_sample_name'][english_mode],
+                     mime='application/vnd.ms-excel'
+              )
 
 streamlit_analytics.stop_tracking(firestore_key_file='db_key.json', firestore_collection_name='app_metrics')
