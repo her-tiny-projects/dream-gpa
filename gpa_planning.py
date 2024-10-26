@@ -24,8 +24,6 @@ if 'syllabus_master_data' not in st.session_state:
        st.session_state.syllabus_master_data = empty_table
 if 'subject_registered' not in st.session_state:
        st.session_state.subject_registered = empty_table
-if 'current_max_credit' not in st.session_state:
-       st.session_state.current_max_credit = 0
 
 # 4 CRITERIA:
        # all subject
@@ -90,6 +88,38 @@ if st.session_state.grade_master_data.empty == False and st.session_state.syllab
                      target_gpa_input = st.number_input('*GPA mục tiêu không tính quốc phòng, thể chất*', min_value=0.00, max_value=4.00, value=None)
                      st.write('Bạn đã nhập GPA mục tiêu là:', target_gpa_input)
 
+       st.markdown('#### :small_orange_diamond: Kiểm tra các môn đã học:')
+       with st.expander('Chi tiết các môn đã học'):
+              st.warning('Dưới đây là các môn bạn đã học và lấy điểm cao nhất trong các lần học (không tính quốc phòng, giáo dục thể chất). Trường hợp có môn học bạn :red[học thừa hoặc dự kiến hủy điểm], bỏ chọn cột Checkbox phía dưới:')
+              q = """
+              SELECT
+                     "Học kỳ đăng ký học",
+                     "Mã môn học",
+                     "Tên môn học", 
+                     "Số tín chỉ",
+                     "Điểm TK (C)",
+                     "Điểm TK (4)"
+              FROM syllabus_grade_master_data
+              WHERE "Đã học" = 1
+              ORDER BY "Học kỳ đăng ký học"      
+              """
+              subject_learned = duckdb.sql(q).df()
+              subject_learned.insert(0, 'Checkbox', True)
+              subject_learned = st.data_editor(
+                     subject_learned,
+                     column_config={
+                            'Checkbox': st.column_config.CheckboxColumn(
+                                   help='Bỏ tick các môn **học thừa hoặc dự kiến hủy điểm**',
+                                   default=True # Default value when new row added by user
+                            )
+                     },
+                     disabled=['Học kỳ đăng ký học', 'Mã môn học', 'Tên môn học', 'Số tín chỉ', 'Điểm TK (C)', 'Điểm TK (4)'],
+                     hide_index=True,
+                     height=200,
+                     use_container_width=True
+              )
+              current_max_credit = subject_learned[subject_learned['Checkbox']==True]['Số tín chỉ'].sum()
+              st.write(f'*Tổng số tín chỉ đã học: :red[**{current_max_credit}**]*')
 
        st.markdown('#### :small_orange_diamond: Tick chọn các môn bạn dự kiến học:')
        mandatory1, elective1, thesis1 = st.columns(3)
@@ -423,16 +453,17 @@ if st.session_state.grade_master_data.empty == False and st.session_state.syllab
               total_credit_registered = mandatory_credit_registered1 + mandatory_credit_registered2 + thesis_credit_registered + elective_credit_registered1 + elective_credit_registered2
 
        with input2:
-              current_max_credit = round(st.session_state.current_max_credit)
               try:
 
-                     total_credit_registered_notDF = mandatory_credit_registered1 + thesis_credit_registered + elective_credit_registered1
+                     total_credit_registered1 = mandatory_credit_registered1 + thesis_credit_registered + elective_credit_registered1
+                     total_credit_registered2 = mandatory_credit_registered2 + elective_credit_registered2
                      content = f"""
                             ---
                             **TỔNG SỐ TÍN CHỈ:** :red[**{current_max_credit
-                            +total_credit_registered}**]
-                            - Số tín chỉ đã tick chọn (không bao gồm môn D, F): :red[**{total_credit_registered}**]
-                            - Số tín chỉ đã tích lũy (bao gồm cả môn D, F): :red[**{current_max_credit}**]
+                            +total_credit_registered1}**]
+                            - Số tín chỉ tick chọn học lần đầu: :red[**{total_credit_registered1}**]
+                            - Số tín chỉ đã học: :red[**{current_max_credit}**]
+                                + *Trong đó, số tín chỉ tick chọn cải thiện/ học lại: :red[**{total_credit_registered2}**]*
                             ---
                             """
                      st.markdown(content)
@@ -497,10 +528,10 @@ if st.session_state.grade_master_data.empty == False and st.session_state.syllab
                                           "Mã môn học",
                                           "Số tín chỉ",
                                           "Điểm TK (4)"
-                                   FROM syllabus_grade_master_data
+                                   FROM subject_learned
                                    WHERE CAST("Mã môn học" AS VARCHAR) NOT IN 
                                           (SELECT CAST("Mã môn học" AS VARCHAR) FROM subject_registered)
-                                   AND "Điểm TK (4)" IS NOT NULL
+                                   AND "Checkbox" = TRUE
                                    ),
 
                             temp2 AS
