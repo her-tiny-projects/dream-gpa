@@ -25,7 +25,7 @@
 - Python 3.11
 - ```streamlit``` - web framework
 - ```streamlit-analytics``` - web analytics
-- ```google.oauth2, google.cloud``` - cloud storage of web analytics data 
+- ```google.oauth2, google.cloud``` - cloud storage (web analytics, user feedback)
 - ```pandas``` - data manipulation
 - ```duckdb``` - in-memory data retrieving
 - ```plotly``` - data visualization
