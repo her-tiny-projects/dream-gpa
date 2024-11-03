@@ -13,12 +13,12 @@
 ![flow_chart](https://github.com/user-attachments/assets/ded91d26-fa31-41e8-a20b-14d2bb6164bf)
 
 ## **Web Features:**
-- Transcript and curricular overview
-- Interactive study dashboard
-- Multiple scenarios to achieve target GPA
-- Feedback
-- Bug report
-- Language mode
+- Converting transcript and curriculum to row-wise format
+- Interacting with study dashboard
+- Suggesting multiple scenarios to achieve at least target GPA
+- Sending feedback
+- Reporting bug
+- Setting language mode
 - Web analytics
 
 ## **Requirements:**
