@@ -1,16 +1,17 @@
-# [About Dream GPA:](https://dream-gpa.onrender.com/)
+# [**About Dream GPA:**](https://dream-gpa.onrender.com/)
 **Dream GPA** is my tiny project to assist FTU students with planning their studies systematically and strategically. This tool is especially helpful for students aiming for a high GPA to achieve scholarship or graduate with hornors, or for ones trying to balance multiple commitments like study, part-time job, and extracurricular activities.
-
-📌 Visit website: https://dream-gpa.onrender.com/
-![dream-gpa-gif2](https://github.com/user-attachments/assets/a3c45153-ce77-4bd1-9707-60ec625ae1ef)
 
 ## **Usecases:**
 - Map out different paths to achieve target GPA
 - Estimate maximum GPA based on your current performance
 - Keep track of your learning progress interactively
 
-## **Flowchart:**
-![flow_chart](https://github.com/user-attachments/assets/ded91d26-fa31-41e8-a20b-14d2bb6164bf)
+📌 Visit website: **https://dream-gpa.onrender.com/**
+
+:bulb: Curious about this website but not a FTU student? Using the templates attached in [**this page**](https://dream-gpa.onrender.com/upload_login) to start discovering web features
+
+## **Web Preview:**
+![dream-gpa-gif2](https://github.com/user-attachments/assets/a3c45153-ce77-4bd1-9707-60ec625ae1ef)
 
 ## **Web Features:**
 - Converting transcript and curriculum to row-wise format
@@ -20,6 +21,9 @@
 - Reporting bug
 - Setting language mode
 - Web analytics
+
+## **Flowchart:**
+![flow_chart](https://github.com/user-attachments/assets/ded91d26-fa31-41e8-a20b-14d2bb6164bf)
 
 ## **Requirements:**
 - Python 3.11
