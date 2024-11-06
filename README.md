@@ -1,5 +1,5 @@
 # [**About Dream GPA:**](https://dream-gpa.onrender.com/)
-**Dream GPA** is my tiny project to assist FTU students with planning their studies systematically and strategically. This tool is especially helpful for students aiming for a high GPA to achieve scholarship or graduate with hornors, or for ones trying to balance multiple commitments like study, part-time job, and extracurricular activities.
+**Dream GPA** is my tiny project to assist FTU students with planning their studies systematically and strategically. This tool is especially helpful for students aiming for a high GPA to achieve scholarship or graduate with honors, or for ones trying to balance multiple commitments like study, part-time job, and extracurricular activities.
 
 ## **Usecases:**
 - Map out different paths to achieve target GPA
