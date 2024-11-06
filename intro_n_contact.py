@@ -19,7 +19,7 @@ intro_vn = """
        Video hướng dẫn sử dụng :arrow_down::
        """
 intro_en = """
-       :red[**Dream GPA**] is my tiny project to assist FTU students with planning their studies more effectively. Whether you are aiming for a high GPA to achieve scholarship/ graduate with hornors or struggling to balance multiple activities like study, part-time job, club or you are just wondering how to attain your desired GPA, this tool is for you.\n
+       :red[**Dream GPA**] is my tiny project to assist FTU students with planning their studies more effectively. Whether you are aiming for a high GPA to achieve scholarship/ graduate with honors or struggling to balance multiple activities like study, part-time job, club or you are just wondering how to attain your desired GPA, this tool is for you.\n
 
        This mini tool can help you:
        - Map out different paths to your dream GPA
@@ -75,9 +75,9 @@ st.markdown(language_index['title'][english_mode])
 st.markdown(language_index['intro'][english_mode])
 
 
-video = st.columns((1,2,1))
-# link_youtube = '' 
-# video[1].video(link_youtube)
+video = st.columns((1,2.5,1))
+link_youtube = 'https://www.youtube.com/watch?v=KkIF94vgZeI' 
+video[1].video(link_youtube)
 
 
 st.markdown(language_index['connect'][english_mode])
