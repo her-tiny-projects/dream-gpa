@@ -20,8 +20,18 @@ class grade_xlsx2df():
     #    'Số tín chỉ', 'Điểm thi', 'Điểm TK (10)', 'Điểm TK (4)', 'Điểm TK (C)',
     #    'Kết quả', 'Chi tiết']
     #     grade = grade[usecols]
-        # determine semester in which subject falls in
+
+        # ignore noise data:
+        # ignore these lines: '- Xếp loại điểm rèn luyện:', '- Phân loại điểm trung bình HK:'
+        grade = grade[~grade['Stt'].isin(['- Xếp loại điểm rèn luyện:', '- Phân loại điểm trung bình HK:'])]
+        # ignore this sentence: - Điểm trung bình học kỳ hệ 4:...- Điểm trung bình học kỳ hệ 10:...- Số tín chỉ đạt học kỳ:...- Điểm rèn luyện học kỳ:...- Xếp loại điểm rèn luyện:Xuất sắc- Điểm trung bình tích lũy hệ 4:...- Điểm trung bình tích lũy hệ 10:...- Số tín chỉ tích lũy:...- Phân loại điểm trung bình HK:Xuất sắc
         grade['Tên học kỳ'] = grade['Stt'].astype(str).apply(lambda x: x if len(x) > 3 and 'Điểm' not in x and 'tín chỉ' not in x else '')
+        
+        
+        grade = grade.reset_index()
+                    
+            
+        # determine semester in which subject falls in
         semester_position = []
         for i in range(0, len(grade)): 
             if grade.loc[i, 'Tên học kỳ'] != '':
@@ -45,7 +55,8 @@ class grade_xlsx2df():
         # format semester
         def semester_formatting(x):
             try:
-                item1 = x[-9:]
+                start_year = x.find('20')
+                item1 = x[start_year:]
                 item2 = x[len('Học kỳ ')]
                 semester_formatting = '(' + item1 + ').' + item2
                 return semester_formatting
@@ -61,8 +72,6 @@ class grade_xlsx2df():
         """
         grade_detail = duckdb.sql(q).df()
         
-
-        
         # summary by semester 
         q = """
             SELECT
@@ -74,7 +83,18 @@ class grade_xlsx2df():
             AND LENGTH(Stt) < 40 -- exclude record with the longest summary
             """
         summary = duckdb.sql(q).df()
+        # ignore rows containing strings
+        # def is_float(x):
+        #     try:
+        #         float(x)
+        #         return True
+        #     except:
+        #         return False
+
+        # summary['Float_check'] = summary['Value'].apply(lambda x: is_float(x))
+        # summary = summary[summary['Float_check']==True]
         summary['Attribute'] = summary['Attribute'].apply(lambda x: x.replace('- ', '').replace(':', ''))
+        summary = summary[['Học kỳ', 'Attribute', 'Value']]
         summary = pd.pivot_table(summary, index='Học kỳ', columns='Attribute', values='Value', aggfunc='sum')
         summary['Học kỳ'] = summary.index
         summary.index = range(1, len(summary)+1)
@@ -113,7 +133,8 @@ class grade_xlsx2df():
         
 # diem:syllabus = many:one
 if __name__ == '__main__':
-    grade = pd.read_excel(r"C:\Users\admin\Downloads\Diem (4).xlsx")
+    # grade = pd.read_excel(r"D:\TPB\Personal Project\dream_gpa\data sample\Diem (4).xlsx")
+    grade = pd.read_excel(r"C:\Users\admin\Downloads\Diem.xlsx")
     grade_master_data = grade_xlsx2df.convert_xlsx2df(grade)
     st.dataframe(grade_master_data)
 

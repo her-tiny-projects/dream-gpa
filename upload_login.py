@@ -12,7 +12,6 @@ import time
 import grade_xlsx2df, syllabus_xlsx2df
 
 
-
 empty_table = pd.DataFrame(columns=['temp'], index=[''])
 empty_table.drop(empty_table.index, inplace=True)
 

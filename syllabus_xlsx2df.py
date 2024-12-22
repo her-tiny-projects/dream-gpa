@@ -45,7 +45,8 @@ class syllabus_xlsx2df():
         
         # format semester
         def semester_formatting(x):
-            item1 = x[-9:]
+            start_year = x.find('20')
+            item1 = x[start_year:]
             item2 = x[len('Học kỳ ')]
             semester_formatting = '(' + item1 + ').' + item2
             return semester_formatting
