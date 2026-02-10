@@ -1,4 +1,5 @@
 import streamlit as st
+from datetime import datetime
 
 # 1. HDSD & CONTACT
 
@@ -32,10 +33,11 @@ intro_en = """
 connect_vn = '### KẾT NỐI VỚI MÌNH:'
 connect_en = '### CONNECT WITH ME:'
 
-skype_link = 'https://join.skype.com/invite/x7OxEPJyQ4tb'
+current_date = datetime.now().strftime('%Y%m%d')
+email_link = f'https://mail.google.com/mail/u/0/?fs=1&to=hertinyprojects@gmail.com&su={current_date}+DreamGPA+AMA&tf=cm'
 github_link = 'https://github.com/her-tiny-projects'
-contact1_vn = ':speech_balloon: Liên hệ với mình qua Skype [tại đây](%s)'%skype_link
-contact1_en = ':speech_balloon: Start a Skype conversation [here](%s)'%skype_link
+contact1_vn = ':speech_balloon: Liên hệ với mình qua Email [tại đây](%s)'%email_link
+contact1_en = ':speech_balloon: Ask me anything about Dream GPA [here](%s)'%email_link
 contact2_vn = ':link: Xem thêm dự án của mình trên GitHub [tại đây](%s)'%github_link
 contact2_en = ':link: Explore my projects on GitHub [here](%s)'%github_link
 contact_vn = f"""
