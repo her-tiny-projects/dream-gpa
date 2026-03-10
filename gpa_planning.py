@@ -77,7 +77,7 @@ if st.session_state.grade_master_data.empty == False and st.session_state.syllab
        """
        syllabus_grade_master_data = duckdb.sql(q).df()
        syllabus_grade_master_data.insert(0, 'Checkbox', False)
-
+       
 
        st.markdown("""## 1. ĐĂNG KÝ MÔN HỌC""")
        input1, input2 = st.columns((2, 1))

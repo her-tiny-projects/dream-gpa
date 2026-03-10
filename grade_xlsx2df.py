@@ -75,6 +75,7 @@ class grade_xlsx2df():
         for grade_detail_col in grade_detail_2be_cleaned:
             grade_detail[grade_detail_col] = pd.to_numeric(grade_detail[grade_detail_col], errors='coerce')
         grade_detail['Điểm TK (C)'] = grade_detail['Điểm TK (C)'].astype(str).apply(lambda x: x.replace('-', ''))
+        grade_detail = grade_detail[grade_detail['Điểm TK (4)']>=0]
         
         st.dataframe(grade_detail)
         
@@ -140,7 +141,8 @@ class grade_xlsx2df():
 # diem:syllabus = many:one
 if __name__ == '__main__':
     # grade = pd.read_excel(r"D:\TPB\Personal Project\dream_gpa\data sample\Diem (4).xlsx")
-    grade = pd.read_excel(r"D:\Bỏng ngô\dream_gpa_template_temp\Diem (5).xlsx")
+    # grade = pd.read_excel(r"D:\Bỏng ngô\dream_gpa_template_temp\Diem (5).xlsx")
+    grade = pd.read_excel(r"D:\Bỏng ngô\Diem (8).xlsx")
     # grade = pd.read_excel(r"C:\Users\admin\Downloads\Diem.xlsx")
     grade_master_data = grade_xlsx2df.convert_xlsx2df(grade)
     st.dataframe(grade_master_data)
