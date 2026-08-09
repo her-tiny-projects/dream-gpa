@@ -1,6 +1,6 @@
 [client]
 showErrorDetails = false
-showSidebarNavigation = false
+showSidebarNavigation = true
 
 [theme]
 base="dark"
