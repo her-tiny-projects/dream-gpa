@@ -3,7 +3,8 @@ numpy==1.26.4
 pandas==2.1.4
 openpyxl==3.0.10
 plotly==5.9.0
-protobuf==5.28.2
+# protobuf==5.28.2
+protobuf==4.25.9
 streamlit==1.39.0
 streamlit_analytics==0.4.1
 toml==0.10.2

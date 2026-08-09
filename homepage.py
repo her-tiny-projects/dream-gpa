@@ -67,13 +67,14 @@ with st.sidebar:
 
 
 
-intro_n_contact = st.Page('intro_n_contact.py', title=langugage_index['welcome'][english_mode], icon=':material/home:')
-upload_login = st.Page('upload_login.py', title=langugage_index['upload_data'][english_mode], icon=':material/cloud_upload:')
-bug_report = st.Page('bug_report.py', title=langugage_index['report_bugs'][english_mode], icon=':material/brightness_alert:')
-grade_subject_overview = st.Page('grade_subject_overview.py', title=langugage_index['overview'][english_mode], icon=':material/table:')
-visualization = st.Page('visualization.py', title=langugage_index['visualization'][english_mode], icon=':material/dashboard:')
-gpa_planning = st.Page('gpa_planning.py', title=langugage_index['planning'][english_mode], icon=':material/calculate:')
-feedback = st.Page('feedback.py', title=langugage_index['feedback'][english_mode], icon=':material/add_comment:')
+
+intro_n_contact = st.Page('2_intro_n_contact.py', title=langugage_index['welcome'][english_mode], icon=':material/home:')
+upload_login = st.Page('3_upload_login.py', title=langugage_index['upload_data'][english_mode], icon=':material/cloud_upload:')
+bug_report = st.Page('4_bug_report.py', title=langugage_index['report_bugs'][english_mode], icon=':material/brightness_alert:')
+grade_subject_overview = st.Page('5_grade_subject_overview.py', title=langugage_index['overview'][english_mode], icon=':material/table:', url_path='grade_subject_overview')
+visualization = st.Page('6_visualization.py', title=langugage_index['visualization'][english_mode], icon=':material/dashboard:', url_path='visualization')
+gpa_planning = st.Page('7_gpa_planning.py', title=langugage_index['planning'][english_mode], icon=':material/calculate:', url_path='gpa_planning')
+feedback = st.Page('8_feedback.py', title=langugage_index['feedback'][english_mode], icon=':material/add_comment:', url_path='feedback')
 
 
 if st.session_state.grade_upload.empty==False and st.session_state.syllabus_upload.empty==False:
