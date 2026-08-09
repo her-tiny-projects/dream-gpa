@@ -16,22 +16,19 @@ class grade_xlsx2df():
         self.grade = grade
         
     def convert_xlsx2df(grade):
-    #     usecols = ['Stt', 'Mã MH', 'Môn thay thế', 'Nhóm/tổ môn học', 'Tên môn học',
-    #    'Số tín chỉ', 'Điểm thi', 'Điểm TK (10)', 'Điểm TK (4)', 'Điểm TK (C)',
-    #    'Kết quả', 'Chi tiết']
-    #     grade = grade[usecols]
 
-        # ignore noise data:
-        # ignore these lines: '- Xếp loại điểm rèn luyện:', '- Phân loại điểm trung bình HK:'
+        #=== ĐIỂM THEO MÔN HỌC ===========
+        # 1. ignore noise data:
+        ## ignore these lines: '- Xếp loại điểm rèn luyện:', '- Phân loại điểm trung bình HK:'
         grade = grade[~grade['Stt'].isin(['- Xếp loại điểm rèn luyện:', '- Phân loại điểm trung bình HK:'])]
-        # ignore this sentence: - Điểm trung bình học kỳ hệ 4:...- Điểm trung bình học kỳ hệ 10:...- Số tín chỉ đạt học kỳ:...- Điểm rèn luyện học kỳ:...- Xếp loại điểm rèn luyện:Xuất sắc- Điểm trung bình tích lũy hệ 4:...- Điểm trung bình tích lũy hệ 10:...- Số tín chỉ tích lũy:...- Phân loại điểm trung bình HK:Xuất sắc
-        grade['Tên học kỳ'] = grade['Stt'].astype(str).apply(lambda x: x if len(x) > 3 and 'Điểm' not in x and 'tín chỉ' not in x else '')
-        
-        
+
+
+        ## ignore this sentence: - Điểm trung bình học kỳ hệ 4:...- Điểm trung bình học kỳ hệ 10:...- Số tín chỉ đạt học kỳ:...- Điểm rèn luyện học kỳ:...- Xếp loại điểm rèn luyện:Xuất sắc- Điểm trung bình tích lũy hệ 4:...- Điểm trung bình tích lũy hệ 10:...- Số tín chỉ tích lũy:...- Phân loại điểm trung bình HK:Xuất sắc
+        grade['Tên học kỳ'] = grade['Stt'].astype(str).apply(lambda x: x if len(x) > 3 and 'điểm' not in x.lower() and 'tín chỉ' not in x.lower() else '')
+
         grade = grade.reset_index()
-                    
             
-        # determine semester in which subject falls in
+        # 2. determine semester in which subject falls in
         semester_position = []
         for i in range(0, len(grade)): 
             if grade.loc[i, 'Tên học kỳ'] != '':
@@ -75,10 +72,10 @@ class grade_xlsx2df():
         for grade_detail_col in grade_detail_2be_cleaned:
             grade_detail[grade_detail_col] = pd.to_numeric(grade_detail[grade_detail_col], errors='coerce')
         grade_detail['Điểm TK (C)'] = grade_detail['Điểm TK (C)'].astype(str).apply(lambda x: x.replace('-', ''))
-        grade_detail = grade_detail[grade_detail['Điểm TK (4)']>=0]
+        grade_detail = grade_detail[grade_detail['Điểm TK (4)']>=0] # chỉ lấy những môn đã lên điểm
+
         
-        st.dataframe(grade_detail)
-        
+        #=== ĐIỂM THEO KỲ HỌC ===========
         # summary by semester 
         q = """
             SELECT
@@ -90,6 +87,8 @@ class grade_xlsx2df():
             AND LENGTH(Stt) < 40 -- exclude record with the longest summary
             """
         summary = duckdb.sql(q).df()
+
+
         # ignore rows containing strings
         # def is_float(x):
         #     try:
@@ -107,11 +106,13 @@ class grade_xlsx2df():
         summary.index = range(1, len(summary)+1)
 
 
+        #=== MÔN HỌC + KỲ HỌC ===========
         # mapping subject & summary and cleaning
         q = """
         SELECT *
         FROM grade_detail gd
         LEFT JOIN summary sm USING("Học kỳ")
+        ORDER BY "Học kỳ"
         """
         grade_cleaned = duckdb.sql(q).df()
 
@@ -120,7 +121,6 @@ class grade_xlsx2df():
                 'Điểm thi', 'Điểm TK (10)', 'Điểm TK (4)', 'Điểm TK (C)', 
                 'Điểm trung bình học kỳ hệ 10', 'Điểm trung bình học kỳ hệ 4',
                 'Số tín chỉ đạt học kỳ', 
-                # 'Điểm rèn luyện học kỳ',
                 'Điểm trung bình tích lũy hệ 10', 'Điểm trung bình tích lũy hệ 4',
                 'Số tín chỉ tích lũy']
         grade_cleaned = grade_cleaned[usecols]
@@ -129,12 +129,12 @@ class grade_xlsx2df():
         grade_cleaned.columns = ['Học kỳ đăng ký học' if x == 'Học kỳ' else x for x in grade_cleaned.columns]
         # cast dtype
         item_2cleaned = ['Số tín chỉ tích lũy', 'Số tín chỉ đạt học kỳ', 
-                        #  'Điểm rèn luyện học kỳ',
                         'Điểm trung bình học kỳ hệ 10', 'Điểm trung bình học kỳ hệ 4',
                         'Điểm trung bình tích lũy hệ 10', 'Điểm trung bình tích lũy hệ 4']
         for item in item_2cleaned:
             grade_cleaned[item] = grade_cleaned[item].astype(np.float32).apply(lambda x: np.nan if x==0 else x)
         grade_cleaned['Học kỳ đăng ký học'] = grade_cleaned['Học kỳ đăng ký học'].astype(str)
+
         return grade_cleaned
 
         
@@ -142,8 +142,9 @@ class grade_xlsx2df():
 if __name__ == '__main__':
     # grade = pd.read_excel(r"D:\TPB\Personal Project\dream_gpa\data sample\Diem (4).xlsx")
     # grade = pd.read_excel(r"D:\Bỏng ngô\dream_gpa_template_temp\Diem (5).xlsx")
-    grade = pd.read_excel(r"D:\Bỏng ngô\Diem (8).xlsx")
-    # grade = pd.read_excel(r"C:\Users\admin\Downloads\Diem.xlsx")
+    # grade = pd.read_excel(r"D:\Bỏng ngô\Diem (8).xlsx")
+    # grade = pd.read_excel(r"D:\TPB\Personal Project\dream_gpa\data sample\archive\DiemMau.xlsx")
+    grade = pd.read_excel(r"D:\TPB\Personal Project\dream_gpa\data sample\Diem.xlsx")
     grade_master_data = grade_xlsx2df.convert_xlsx2df(grade)
     st.dataframe(grade_master_data)
 

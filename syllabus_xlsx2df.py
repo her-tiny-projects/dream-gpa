@@ -18,8 +18,9 @@ class syllabus_xlsx2df():
     def convert_xlsx2df(syllabus):
         usecols = ['Stt', 'Mã MH', 'Tên môn học', 'Số tín chỉ', 'Môn bắt buộc', 'Đã học',
        'Nhóm', 'Nhánh', 'Số tín chỉ tối thiểu', 'Số tín chỉ tối đa',
-       'Môn học đã học và đạt', 'Tổng tiết', 'Lý thuyết', 'Thực hành',
-       'Tiết thành phần']
+       'Môn học đã học và đạt', 'Tổng tiết', 'Lý thuyết', 'Thực hành'
+    #    'Tiết thành phần']
+        ]
         syllabus = syllabus[usecols]
         # determine semester in which subject falls in
         syllabus['Tên học kỳ'] = syllabus['Stt'].astype(str).apply(lambda x: x if x.__contains__('Học kỳ') else '')
@@ -69,8 +70,8 @@ class syllabus_xlsx2df():
         
 # diem:syllabus = many:one
 if __name__ == '__main__':
-    syllabus = pd.read_excel(r"C:\Users\admin\Downloads\ChuongTrinhDaoTao (2).xlsx")
-    print(syllabus.columns)
+    # syllabus = pd.read_excel(r"C:\Users\admin\Downloads\ChuongTrinhDaoTao (2).xlsx")
+    syllabus = pd.read_excel(r"D:\TPB\Personal Project\dream_gpa\data sample\ChuongTrinhDaoTao.xlsx")
     syllabus_master_data = syllabus_xlsx2df.convert_xlsx2df(syllabus)
     st.dataframe(syllabus_master_data)
 
