@@ -69,11 +69,12 @@ if st.session_state.grade_master_data.empty == False and st.session_state.syllab
               FROM syllabus_master_data t1
               LEFT JOIN max_grade_subject_learned USING("Mã môn học")
               WHERE "Mã môn học" NOT IN
-                     (SELECT DISTINCT "Mã môn học"
+                     (SELECT DISTINCT "Mã môn học" --loại bỏ giáo dục thể chất, quốc phòng
                      FROM syllabus_master_data
                      WHERE "Mã môn học" IN ('GDQP', 'GDTC1', 'GDTC2', 'GDTC3')
                      OR LOWER("Tên môn học") LIKE '%quốc phòng%'
-                     OR LOWER("Tên môn học") LIKE '%thể chất%')
+                     OR LOWER("Tên môn học") LIKE '%thể chất%'
+                     OR "Nhóm" >= 50)
        """
        syllabus_grade_master_data = duckdb.sql(q).df()
        syllabus_grade_master_data.insert(0, 'Checkbox', False)
@@ -115,7 +116,7 @@ if st.session_state.grade_master_data.empty == False and st.session_state.syllab
                      },
                      disabled=['Học kỳ đăng ký học', 'Mã môn học', 'Tên môn học', 'Số tín chỉ', 'Điểm TK (C)', 'Điểm TK (4)'],
                      hide_index=True,
-                     height=200,
+                     height=309,
                      use_container_width=True
               )
               current_max_credit = subject_learned[subject_learned['Checkbox']==True]['Số tín chỉ'].sum()
@@ -259,7 +260,7 @@ if st.session_state.grade_master_data.empty == False and st.session_state.syllab
               # note: check xem ở chuyên ngành khác thì nhóm học phần tốt nghiệp có = 9 --> không --> dựa vào keyword   
               with thesis1:
                      q = """
-                            SELECT
+                            SELECT DISTINCT
                                    "Checkbox",
                                    "Mã môn học",
                                    "Tên môn học",
@@ -547,14 +548,19 @@ if st.session_state.grade_master_data.empty == False and st.session_state.syllab
                             SELECT * FROM temp2)
                      """
                      subject_calculate_gpa = duckdb.sql(q).df()
+
+                     
+
                      subject_calculate_gpa['Điểm TK (4)'] = subject_calculate_gpa['Điểm TK (4)'].apply(lambda x: int(float(x)) if x != '' else np.nan)
                      subject_calculate_gpa['Tín chỉ x Điểm'] = subject_calculate_gpa['Số tín chỉ']*subject_calculate_gpa['Điểm TK (4)']
 
 
                      credit_calculate_gpa = subject_calculate_gpa['Số tín chỉ'].sum()
-                     credit_grade_accumulated = subject_calculate_gpa['Tín chỉ x Điểm'].sum()
+                     credit_grade_accumulated = int(subject_calculate_gpa['Tín chỉ x Điểm'].sum())
+
+
                      # credit_grade_tobe_accumulated = target_gpa*credit_calculate_gpa - credit_grade_accumulated
-                     credit_tobe_accumulated = subject_registered['Số tín chỉ'].sum()
+                     credit_tobe_accumulated = int(subject_registered['Số tín chỉ'].sum())
 
 
                      def sublist(mylist):
